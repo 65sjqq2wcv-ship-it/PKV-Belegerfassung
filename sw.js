@@ -1,19 +1,19 @@
-const CACHE_NAME = 'pkv-belege-v1';
+const CACHE_NAME = 'pkv-belege-v1.2';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/styles.css',
-    '/app.js',
-    '/manifest.json',
-    '/logo.png',
-    '/icons/icon-72x72.png',
-    '/icons/icon-96x96.png',
-    '/icons/icon-128x128.png',
-    '/icons/icon-144x144.png',
-    '/icons/icon-152x152.png',
-    '/icons/icon-192x192.png',
-    '/icons/icon-384x384.png',
-    '/icons/icon-512x512.png'
+    './',
+    './index.html',
+    './styles.css',
+    './app.js',
+    './manifest.json',
+    './logo.png',
+    './icons/icon-72x72.png',
+    './icons/icon-96x96.png',
+    './icons/icon-128x128.png',
+    './icons/icon-144x144.png',
+    './icons/icon-152x152.png',
+    './icons/icon-192x192.png',
+    './icons/icon-384x384.png',
+    './icons/icon-512x512.png'
 ];
 
 // Installation
@@ -23,6 +23,9 @@ self.addEventListener('install', event => {
             .then(cache => {
                 console.log('Cache geöffnet');
                 return cache.addAll(urlsToCache);
+            })
+            .catch(error => {
+                console.error('Fehler beim Cachen der Dateien:', error);
             })
     );
 });
@@ -72,8 +75,8 @@ self.addEventListener('sync', event => {
 self.addEventListener('push', event => {
     const options = {
         body: event.data ? event.data.text() : 'Neue Benachrichtigung',
-        icon: '/icons/icon-192x192.png',
-        badge: '/icons/icon-96x96.png',
+        icon: './icons/icon-192x192.png',
+        badge: './icons/icon-96x96.png',
         vibrate: [100, 50, 100],
         data: {
             dateOfArrival: Date.now(),
@@ -83,12 +86,12 @@ self.addEventListener('push', event => {
             {
                 action: 'explore',
                 title: 'App öffnen',
-                icon: '/icons/checkmark.png'
+                icon: './icons/checkmark.png'
             },
             {
                 action: 'close',
                 title: 'Schließen',
-                icon: '/icons/xmark.png'
+                icon: './icons/xmark.png'
             }
         ]
     };
@@ -104,7 +107,7 @@ self.addEventListener('notificationclick', event => {
 
     if (event.action === 'explore') {
         event.waitUntil(
-            clients.openWindow('/')
+            clients.openWindow('./')
         );
     }
 });

@@ -2,11 +2,12 @@
     "name": "PKV Belege",
     "short_name": "PKV Belege",
     "description": "Private Krankenversicherung - Belegerfassung und -verwaltung",
-    "start_url": "/",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#4A6B7C",
     "theme_color": "#4A6B7C",
     "orientation": "portrait",
+    "scope": "./",
     "icons": [
         {
             "src": "icons/icon-72x72.png",
@@ -73,10 +74,9 @@
         }
     ],
     "lang": "de",
-    "scope": "/",
     "prefer_related_applications": false,
     "share_target": {
-        "action": "/",
+        "action": "./",
         "method": "GET",
         "params": {
             "title": "title",
@@ -89,7 +89,7 @@
             "name": "Neuer Beleg",
             "short_name": "Neuer Beleg",
             "description": "Schnell einen neuen Beleg hinzufügen",
-            "url": "/?shortcut=new-receipt",
+            "url": "./?shortcut=new-receipt",
             "icons": [
                 {
                     "src": "icons/shortcut-add.png",
@@ -101,7 +101,7 @@
             "name": "Übersicht",
             "short_name": "Übersicht",
             "description": "Aktuelle Jahresübersicht anzeigen",
-            "url": "/?shortcut=overview",
+            "url": "./?shortcut=overview",
             "icons": [
                 {
                     "src": "icons/shortcut-overview.png",

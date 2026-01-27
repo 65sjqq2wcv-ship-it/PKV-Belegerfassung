@@ -259,13 +259,13 @@ class PKVBelegeApp {
     // Export-Funktion
     exportJSON() {
         const exportData = {
-            version: '1.0',
+            version: '1.2',
             exportDate: new Date().toISOString(),
             belege: this.belege,
             einstellungen: this.einstellungen,
             appInfo: {
                 name: 'PKV Belege',
-                version: '1.0'
+                version: '1.2'
             }
         };
 

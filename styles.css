@@ -594,3 +594,84 @@ h2 {
         flex-direction: column;
     }
 }
+
+/* Fügen Sie diese Styles am Ende der bestehenden CSS-Datei hinzu */
+
+/* Header Versionsinfo */
+.header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.version-info {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+/* Footer */
+.app-footer {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--background-color);
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--secondary-color);
+}
+
+.footer-text {
+    font-weight: 500;
+}
+
+.footer-version {
+    font-family: monospace;
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.footer-year {
+    opacity: 0.7;
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 768px) {
+    .header-content {
+        align-items: flex-start;
+    }
+    
+    .version-info {
+        font-size: 0.7rem;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .footer-version {
+        order: -1;
+    }
+}
+
+/* Hover-Effekt für Footer-Version */
+.footer-version:hover {
+    background: var(--accent-color);
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+    cursor: default;
+}

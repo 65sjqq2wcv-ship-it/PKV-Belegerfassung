@@ -4,17 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PKV Belege</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#4A6B7C">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="./icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./icons/icon-16x16.png">
+    <!-- PWA Meta Tags für iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="PKV Belege">
+    <!-- PWA Meta Tags für Android -->
+    <meta name="mobile-web-app-capable" content="yes">
 </head>
 <body>
     <div class="app">
         <header>
             <div class="logo">
                 <img src="logo.png" alt="PKV Belege" class="logo-img">
-                <h1>PKV Belege</h1>
+                <div class="header-content">
+                    <h1>PKV Belege</h1>
+                    <div class="version-info">v1.2</div>
+                </div>
             </div>
         </header>
 
@@ -33,6 +44,7 @@
                     </div>
                 </div>
             </section>
+
             <!-- Import/Export Section -->
             <section class="import-export-section">
                 <h2>Daten verwalten</h2>
@@ -148,6 +160,15 @@
                 </div>
             </section>
         </main>
+
+        <!-- Footer mit Versionsinfo -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <span class="footer-text">PKV Belege</span>
+                <span class="footer-version">Version 1.2</span>
+                <span class="footer-year">© 2024</span>
+            </div>
+        </footer>
     </div>
 
     <!-- Modal für Beleg bearbeiten -->

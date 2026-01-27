@@ -44,7 +44,16 @@ class PKVBelegeApp {
             }
         });
 
-        // Import/Export Event Listeners
+        // Backup Icon und Modal Event Listeners
+        document.getElementById('backup-icon').addEventListener('click', () => this.openBackupModal());
+        document.getElementById('backup-modal-close').addEventListener('click', () => this.closeBackupModal());
+        document.getElementById('backup-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('backup-modal')) {
+                this.closeBackupModal();
+            }
+        });
+
+        // Import/Export Event Listeners im Backup Modal
         document.getElementById('export-json').addEventListener('click', () => this.exportJSON());
         document.getElementById('select-import-file').addEventListener('click', () => this.selectImportFile());
         document.getElementById('import-file').addEventListener('change', (e) => this.handleFileSelect(e));
@@ -53,6 +62,17 @@ class PKVBelegeApp {
 
         // Heute als Standard-Datum setzen
         document.getElementById('beleg-datum').valueAsDate = new Date();
+    }
+
+    // Neue Backup Modal Methoden
+    openBackupModal() {
+        document.getElementById('backup-modal').style.display = 'block';
+        this.updateBackupInfo(); // Info aktualisieren wenn Modal geöffnet wird
+    }
+
+    closeBackupModal() {
+        document.getElementById('backup-modal').style.display = 'none';
+        this.cancelImport(); // Import zurücksetzen wenn Modal geschlossen wird
     }
 
     loadEinstellungen() {
@@ -259,13 +279,13 @@ class PKVBelegeApp {
     // Export-Funktion
     exportJSON() {
         const exportData = {
-            version: '1.3',
+            version: '1.4',
             exportDate: new Date().toISOString(),
             belege: this.belege,
             einstellungen: this.einstellungen,
             appInfo: {
                 name: 'PKV Belege',
-                version: '1.3'
+                version: '1.4'
             }
         };
 
@@ -283,6 +303,11 @@ class PKVBelegeApp {
 
         this.saveLastBackup();
         this.showMessage('Backup erfolgreich erstellt! 💾', 'success');
+        
+        // Modal nach erfolgreichem Export schließen
+        setTimeout(() => {
+            this.closeBackupModal();
+        }, 1500);
     }
 
     // Import-Funktionen
@@ -397,6 +422,11 @@ class PKVBelegeApp {
         this.saveBelege();
         this.updateUI();
         this.cancelImport();
+        
+        // Modal nach erfolgreichem Import schließen
+        setTimeout(() => {
+            this.closeBackupModal();
+        }, 2000);
     }
 
     cancelImport() {
@@ -457,9 +487,16 @@ class PKVBelegeApp {
         message.className = `message ${type}`;
         message.textContent = text;
 
-        // Füge nach der Import/Export-Section ein
-        const importExportSection = document.querySelector('.import-export-section');
-        importExportSection.insertAdjacentElement('afterend', message);
+        // Füge in das Backup Modal ein, falls geöffnet
+        const backupModal = document.getElementById('backup-modal');
+        if (backupModal.style.display === 'block') {
+            const modalContent = backupModal.querySelector('.modal-content');
+            modalContent.insertBefore(message, modalContent.firstChild);
+        } else {
+            // Fallback: füge nach dem Header ein
+            const main = document.querySelector('main');
+            main.insertBefore(message, main.firstChild);
+        }
 
         // Automatisch nach 4 Sekunden ausblenden
         setTimeout(() => {

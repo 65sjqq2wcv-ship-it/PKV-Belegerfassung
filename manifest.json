@@ -108,6 +108,18 @@
                     "sizes": "96x96"
                 }
             ]
+        },
+        {
+            "name": "Backup",
+            "short_name": "Backup",
+            "description": "Daten sichern und wiederherstellen",
+            "url": "./?shortcut=backup",
+            "icons": [
+                {
+                    "src": "icons/shortcut-backup.png",
+                    "sizes": "96x96"
+                }
+            ]
         }
     ]
 }

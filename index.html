@@ -24,93 +24,42 @@
                 <img src="logo.png" alt="PKV Belege" class="logo-img">
                 <div class="header-content">
                     <h1>PKV Belege</h1>
-                    <div class="version-info">v1.3</div>
+                    <div class="version-info">v1.4</div>
                 </div>
+            </div>
+            <div class="header-actions">
+                <button id="backup-icon" class="header-icon-btn" title="Daten verwalten">
+                    💾
+                </button>
             </div>
         </header>
 
         <main>
-            <!-- Einstellungen Section -->
+            <!-- Einstellungen Section - Kompakt -->
             <section class="settings-section">
                 <h2>Einstellungen</h2>
-                <div class="settings-grid">
-                    <div class="setting-item">
+                <div class="settings-compact">
+                    <div class="setting-row">
                         <label for="selbstbeteiligung">Selbstbeteiligung (€):</label>
                         <input type="number" id="selbstbeteiligung" min="0" step="0.01" placeholder="0.00">
                     </div>
-                    <div class="setting-item">
+                    <div class="setting-row">
                         <label for="beitragsrueckerstattung">Beitragsrückerstattung (€):</label>
                         <input type="number" id="beitragsrueckerstattung" min="0" step="0.01" placeholder="0.00">
                     </div>
                 </div>
             </section>
 
-            <!-- Import/Export Section -->
-            <section class="import-export-section">
-                <h2>Daten verwalten</h2>
-                <div class="import-export-grid">
-                    <div class="export-section">
-                        <h3>Daten exportieren</h3>
-                        <button id="export-json" class="btn-primary export-btn">
-                            💾 Backup erstellen
-                        </button>
-                        <p class="export-info">
-                            Erstellt eine vollständige Sicherung aller Belege und Einstellungen.
-                        </p>
-                    </div>
-                    
-                    <div class="import-section">
-                        <h3>Daten importieren</h3>
-                        <div class="import-controls">
-                            <input type="file" id="import-file" accept=".json" style="display: none;">
-                            <button id="select-import-file" class="btn-primary">
-                                📁 Backup wiederherstellen
-                            </button>
-                            <div id="import-file-info" class="file-info">Keine Datei ausgewählt</div>
-                            <div class="import-options" id="import-options" style="display: none;">
-                                <h4>Import-Optionen:</h4>
-                                <label class="radio-option">
-                                    <input type="radio" name="import-mode" value="replace" checked>
-                                    <span>Alle Daten ersetzen</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="import-mode" value="merge">
-                                    <span>Daten zusammenführen</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="import-mode" value="add">
-                                    <span>Nur neue Belege hinzufügen</span>
-                                </label>
-                                <div class="import-buttons">
-                                    <button id="confirm-import" class="btn-primary">
-                                        ✅ Importieren
-                                    </button>
-                                    <button id="cancel-import" class="btn-secondary">
-                                        ❌ Abbrechen
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Backup Info -->
-                <div class="backup-info">
-                    <h3>💡 Backup-Tipp</h3>
-                    <p>Erstellen Sie regelmäßig ein Backup Ihrer Daten. 
-                       Die JSON-Datei enthält alle Belege und Einstellungen.</p>
-                    <div class="last-backup" id="last-backup-info"></div>
-                </div>
-            </section>
-
-            <!-- Jahr Selection -->
+            <!-- Jahr Selection - Kompakt -->
             <section class="year-section">
-                <h2>Jahr auswählen</h2>
-                <select id="jahresauswahl">
-                    <option value="2024">2024</option>
-                    <option value="2025">2025</option>
-                    <option value="2026">2026</option>
-                </select>
+                <div class="year-row">
+                    <label for="jahresauswahl">Jahr auswählen:</label>
+                    <select id="jahresauswahl">
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                    </select>
+                </div>
             </section>
 
             <!-- Übersicht -->
@@ -160,15 +109,6 @@
                 </div>
             </section>
         </main>
-
-        <!-- Footer mit Versionsinfo -->
-        <footer class="app-footer">
-            <div class="footer-content">
-                <span class="footer-text">PKV Belege</span>
-                <span class="footer-version">Version 1.3</span>
-                <span class="footer-year">© 2026</span>
-            </div>
-        </footer>
     </div>
 
     <!-- Modal für Beleg bearbeiten -->
@@ -195,6 +135,70 @@
                     <button type="button" id="edit-cancel" class="btn-secondary">Abbrechen</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Backup Modal -->
+    <div id="backup-modal" class="modal">
+        <div class="modal-content modal-wide">
+            <span class="close" id="backup-modal-close">&times;</span>
+            <h2>💾 Daten verwalten</h2>
+            
+            <div class="backup-grid">
+                <!-- Export Section -->
+                <div class="backup-section">
+                    <h3>📤 Daten exportieren</h3>
+                    <button id="export-json" class="btn-primary backup-btn">
+                        💾 Backup erstellen
+                    </button>
+                    <p class="backup-info-text">
+                        Erstellt eine vollständige Sicherung aller Belege und Einstellungen.
+                    </p>
+                </div>
+                
+                <!-- Import Section -->
+                <div class="backup-section">
+                    <h3>📥 Daten importieren</h3>
+                    <div class="import-controls">
+                        <input type="file" id="import-file" accept=".json" style="display: none;">
+                        <button id="select-import-file" class="btn-primary backup-btn">
+                            📁 Backup wiederherstellen
+                        </button>
+                        <div id="import-file-info" class="file-info">Keine Datei ausgewählt</div>
+                        <div class="import-options" id="import-options" style="display: none;">
+                            <h4>Import-Optionen:</h4>
+                            <label class="radio-option">
+                                <input type="radio" name="import-mode" value="replace" checked>
+                                <span>Alle Daten ersetzen</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="import-mode" value="merge">
+                                <span>Daten zusammenführen</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="import-mode" value="add">
+                                <span>Nur neue Belege hinzufügen</span>
+                            </label>
+                            <div class="import-buttons">
+                                <button id="confirm-import" class="btn-primary">
+                                    ✅ Importieren
+                                </button>
+                                <button id="cancel-import" class="btn-secondary">
+                                    ❌ Abbrechen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Backup Info -->
+            <div class="backup-info-section">
+                <h3>💡 Backup-Tipp</h3>
+                <p>Erstellen Sie regelmäßig ein Backup Ihrer Daten. 
+                   Die JSON-Datei enthält alle Belege und Einstellungen.</p>
+                <div class="last-backup" id="last-backup-info"></div>
+            </div>
         </div>
     </div>
 

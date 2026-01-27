@@ -10,6 +10,7 @@
     --warning-color: #F39C12;
     --danger-color: #E74C3C;
     --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --header-height: 100px; /* Dynamische Header-Höhe */
 }
 
 * {
@@ -18,26 +19,52 @@
     box-sizing: border-box;
 }
 
+/* Safe Area Support für Notch */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background-color: var(--background-color);
     color: var(--text-color);
     line-height: 1.6;
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    margin: 0;
+    min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS Safari Support */
+}
+
+/* iOS Safari Fix */
+html {
+    height: -webkit-fill-available;
 }
 
 .app {
     max-width: 800px;
     margin: 0 auto;
     min-height: 100vh;
+    min-height: -webkit-fill-available;
+    display: flex;
+    flex-direction: column;
 }
 
+/* Fixed Header für App-Feeling */
 header {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
     padding: 1rem;
+    padding-top: calc(1rem + env(safe-area-inset-top)); /* Notch-Support */
     box-shadow: var(--shadow);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
+/* Header Content */
 .logo {
     display: flex;
     align-items: center;
@@ -55,11 +82,27 @@ header {
     font-weight: 600;
 }
 
+.header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.version-info {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+/* Main Content mit Padding für Fixed Header */
 main {
     padding: 1rem;
+    padding-top: calc(var(--header-height) + 1rem);
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    flex: 1;
 }
 
 section {
@@ -353,41 +396,6 @@ h2 {
     margin-top: 1.5rem;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .app {
-        margin: 0;
-    }
-    
-    main {
-        padding: 0.75rem;
-    }
-    
-    section {
-        padding: 1rem;
-    }
-    
-    .overview-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .beleg-item {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-        text-align: left;
-    }
-    
-    .beleg-actions {
-        justify-content: center;
-    }
-    
-    .modal-content {
-        margin: 5% auto;
-        padding: 1.5rem;
-        width: 95%;
-    }
-}
-
 /* Empty State */
 .empty-state {
     text-align: center;
@@ -584,33 +592,6 @@ h2 {
     }
 }
 
-@media (max-width: 768px) {
-    .import-export-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .import-buttons {
-        flex-direction: column;
-    }
-}
-
-/* Fügen Sie diese Styles am Ende der bestehenden CSS-Datei hinzu */
-
-/* Header Versionsinfo */
-.header-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.version-info {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 300;
-    letter-spacing: 0.5px;
-}
-
 /* Footer */
 .app-footer {
     margin-top: 2rem;
@@ -647,14 +628,73 @@ h2 {
     opacity: 0.7;
 }
 
-/* Mobile Anpassungen */
+/* Hover-Effekt für Footer-Version */
+.footer-version:hover {
+    background: var(--accent-color);
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+/* Mobile Anpassungen und Responsive Design */
 @media (max-width: 768px) {
+    :root {
+        --header-height: 90px;
+    }
+    
+    .app {
+        margin: 0;
+    }
+    
+    header {
+        padding: 0.75rem;
+        padding-top: calc(0.75rem + env(safe-area-inset-top));
+    }
+    
     .header-content {
         align-items: flex-start;
     }
     
     .version-info {
         font-size: 0.7rem;
+    }
+    
+    main {
+        padding: 0.75rem;
+        padding-top: calc(var(--header-height) + 0.75rem);
+    }
+    
+    section {
+        padding: 1rem;
+    }
+    
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .beleg-item {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        text-align: left;
+    }
+    
+    .beleg-actions {
+        justify-content: center;
+    }
+    
+    .modal-content {
+        margin: 5% auto;
+        padding: 1.5rem;
+        width: 95%;
+    }
+    
+    .import-export-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .import-buttons {
+        flex-direction: column;
     }
     
     .footer-content {
@@ -668,10 +708,51 @@ h2 {
     }
 }
 
-/* Hover-Effekt für Footer-Version */
-.footer-version:hover {
-    background: var(--accent-color);
-    transform: scale(1.05);
-    transition: all 0.2s ease;
-    cursor: default;
+/* Spezielle iOS/iPadOS Safari Anpassungen */
+@supports (-webkit-touch-callout: none) {
+    .app {
+        min-height: -webkit-fill-available;
+    }
+}
+
+/* Landscape Mode auf Smartphones */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    :root {
+        --header-height: 70px;
+    }
+    
+    header {
+        padding: 0.5rem 1rem;
+        padding-top: calc(0.5rem + env(safe-area-inset-top));
+    }
+    
+    .logo h1 {
+        font-size: 1.2rem;
+    }
+    
+    .logo-img {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* PWA Display Mode - Für installierte Apps */
+@media all and (display-mode: standalone) {
+    header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
+    
+    /* Status Bar Bereich einfärben */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: env(safe-area-inset-top);
+        background: var(--primary-color);
+        z-index: 1000;
+    }
 }

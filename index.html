@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PKV Belege</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4A6B7C">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+</head>
+<body>
+    <div class="app">
+        <header>
+            <div class="logo">
+                <img src="logo.png" alt="PKV Belege" class="logo-img">
+                <h1>PKV Belege</h1>
+            </div>
+        </header>
+
+        <main>
+            <!-- Einstellungen Section -->
+            <section class="settings-section">
+                <h2>Einstellungen</h2>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label for="selbstbeteiligung">Selbstbeteiligung (€):</label>
+                        <input type="number" id="selbstbeteiligung" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="setting-item">
+                        <label for="beitragsrueckerstattung">Beitragsrückerstattung (€):</label>
+                        <input type="number" id="beitragsrueckerstattung" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+            </section>
+            <!-- Import/Export Section -->
+            <section class="import-export-section">
+                <h2>Daten verwalten</h2>
+                <div class="import-export-grid">
+                    <div class="export-section">
+                        <h3>Daten exportieren</h3>
+                        <button id="export-json" class="btn-primary export-btn">
+                            💾 Backup erstellen
+                        </button>
+                        <p class="export-info">
+                            Erstellt eine vollständige Sicherung aller Belege und Einstellungen.
+                        </p>
+                    </div>
+                    
+                    <div class="import-section">
+                        <h3>Daten importieren</h3>
+                        <div class="import-controls">
+                            <input type="file" id="import-file" accept=".json" style="display: none;">
+                            <button id="select-import-file" class="btn-primary">
+                                📁 Backup wiederherstellen
+                            </button>
+                            <div id="import-file-info" class="file-info">Keine Datei ausgewählt</div>
+                            <div class="import-options" id="import-options" style="display: none;">
+                                <h4>Import-Optionen:</h4>
+                                <label class="radio-option">
+                                    <input type="radio" name="import-mode" value="replace" checked>
+                                    <span>Alle Daten ersetzen</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="import-mode" value="merge">
+                                    <span>Daten zusammenführen</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="import-mode" value="add">
+                                    <span>Nur neue Belege hinzufügen</span>
+                                </label>
+                                <div class="import-buttons">
+                                    <button id="confirm-import" class="btn-primary">
+                                        ✅ Importieren
+                                    </button>
+                                    <button id="cancel-import" class="btn-secondary">
+                                        ❌ Abbrechen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Backup Info -->
+                <div class="backup-info">
+                    <h3>💡 Backup-Tipp</h3>
+                    <p>Erstellen Sie regelmäßig ein Backup Ihrer Daten. 
+                       Die JSON-Datei enthält alle Belege und Einstellungen.</p>
+                    <div class="last-backup" id="last-backup-info"></div>
+                </div>
+            </section>
+
+            <!-- Jahr Selection -->
+            <section class="year-section">
+                <h2>Jahr auswählen</h2>
+                <select id="jahresauswahl">
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                </select>
+            </section>
+
+            <!-- Übersicht -->
+            <section class="overview-section">
+                <div class="overview-grid">
+                    <div class="overview-card">
+                        <h3>Gesamtbetrag</h3>
+                        <div class="amount" id="gesamtbetrag">0,00 €</div>
+                    </div>
+                    <div class="overview-card">
+                        <h3>Noch bis Einreichung</h3>
+                        <div class="amount" id="noch-bis-einreichung">0,00 €</div>
+                    </div>
+                    <div class="overview-card lohnt-sich" id="einreichung-status">
+                        <h3>Status</h3>
+                        <div class="status-text" id="status-text">Noch nicht lohnend</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Beleg hinzufügen -->
+            <section class="add-receipt-section">
+                <h2>Neuen Beleg hinzufügen</h2>
+                <form id="beleg-form" class="beleg-form">
+                    <div class="form-group">
+                        <label for="beleg-datum">Datum:</label>
+                        <input type="date" id="beleg-datum" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="beleg-beschreibung">Beschreibung:</label>
+                        <input type="text" id="beleg-beschreibung" required placeholder="z.B. Arztbesuch, Medikament...">
+                    </div>
+                    <div class="form-group">
+                        <label for="beleg-betrag">Betrag (€):</label>
+                        <input type="number" id="beleg-betrag" step="0.01" min="0" required placeholder="0.00">
+                    </div>
+                    <button type="submit" class="btn-primary">Beleg hinzufügen</button>
+                    <button type="button" id="beleg-cancel" class="btn-secondary" style="display: none;">Abbrechen</button>
+                </form>
+            </section>
+
+            <!-- Belege Liste -->
+            <section class="receipts-section">
+                <h2>Belege <span id="belege-jahr">2024</span></h2>
+                <div id="belege-liste" class="belege-liste">
+                    <!-- Belege werden hier dynamisch eingefügt -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal für Beleg bearbeiten -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="modal-close">&times;</span>
+            <h2>Beleg bearbeiten</h2>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label for="edit-datum">Datum:</label>
+                    <input type="date" id="edit-datum" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-beschreibung">Beschreibung:</label>
+                    <input type="text" id="edit-beschreibung" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-betrag">Betrag (€):</label>
+                    <input type="number" id="edit-betrag" step="0.01" min="0" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-primary">Speichern</button>
+                    <button type="button" id="edit-cancel" class="btn-secondary">Abbrechen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

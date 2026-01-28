@@ -16,6 +16,9 @@
     <meta name="apple-mobile-web-app-title" content="PKV Belege">
     <!-- PWA Meta Tags für Android -->
     <meta name="mobile-web-app-capable" content="yes">
+    <!-- Theme Color für Dark Mode Support -->
+    <meta name="theme-color" content="#4A6B7C" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#5A7B8C" media="(prefers-color-scheme: dark)">
 </head>
 <body>
     <div class="app">
@@ -24,7 +27,7 @@
                 <img src="logo.png" alt="PKV Belege" class="logo-img">
                 <div class="header-content">
                     <h1>PKV Belege</h1>
-                    <div class="version-info">v1.4</div>
+                    <div class="version-info">v1.6</div>
                 </div>
             </div>
             <div class="header-actions">
@@ -35,22 +38,22 @@
         </header>
 
         <main>
-            <!-- Einstellungen Section - Kompakt -->
+            <!-- Einstellungen Section -->
             <section class="settings-section">
-                <h2>Einstellungen</h2>
+                <h2>⚙️ Einstellungen</h2>
                 <div class="settings-compact">
                     <div class="setting-row">
-                        <label for="selbstbeteiligung">Selbstbeteiligung (€):</label>
-                        <input type="number" id="selbstbeteiligung" min="0" step="0.01" placeholder="0.00">
+                        <label for="selbstbeteiligung">Selbstbeteiligung:</label>
+                        <input type="number" id="selbstbeteiligung" min="0" step="0.01" placeholder="0,00 €">
                     </div>
                     <div class="setting-row">
-                        <label for="beitragsrueckerstattung">Beitragsrückerstattung (€):</label>
-                        <input type="number" id="beitragsrueckerstattung" min="0" step="0.01" placeholder="0.00">
+                        <label for="beitragsrueckerstattung">Beitragsrückerstattung:</label>
+                        <input type="number" id="beitragsrueckerstattung" min="0" step="0.01" placeholder="0,00 €">
                     </div>
                 </div>
             </section>
 
-            <!-- Jahr Selection - Kompakt -->
+            <!-- Jahr Selection -->
             <section class="year-section">
                 <div class="year-row">
                     <label for="jahresauswahl">Jahr auswählen:</label>
@@ -64,6 +67,7 @@
 
             <!-- Übersicht -->
             <section class="overview-section">
+                <h2>📊 Übersicht <span id="belege-jahr">2024</span></h2>
                 <div class="overview-grid">
                     <div class="overview-card">
                         <h3>Gesamtbetrag</h3>
@@ -82,7 +86,7 @@
 
             <!-- Beleg hinzufügen -->
             <section class="add-receipt-section">
-                <h2>Neuen Beleg hinzufügen</h2>
+                <h2>📝 Neuen Beleg hinzufügen</h2>
                 <form id="beleg-form" class="beleg-form">
                     <div class="form-group">
                         <label for="beleg-datum">Datum:</label>
@@ -90,11 +94,11 @@
                     </div>
                     <div class="form-group">
                         <label for="beleg-beschreibung">Beschreibung:</label>
-                        <input type="text" id="beleg-beschreibung" required placeholder="z.B. Arztbesuch, Medikament...">
+                        <input type="text" id="beleg-beschreibung" required placeholder="z.B. Arztbesuch...">
                     </div>
                     <div class="form-group">
-                        <label for="beleg-betrag">Betrag (€):</label>
-                        <input type="number" id="beleg-betrag" step="0.01" min="0" required placeholder="0.00">
+                        <label for="beleg-betrag">Betrag:</label>
+                        <input type="number" id="beleg-betrag" step="0.01" min="0" required placeholder="0,00 €">
                     </div>
                     <button type="submit" class="btn-primary">Beleg hinzufügen</button>
                     <button type="button" id="beleg-cancel" class="btn-secondary" style="display: none;">Abbrechen</button>
@@ -103,7 +107,7 @@
 
             <!-- Belege Liste -->
             <section class="receipts-section">
-                <h2>Belege <span id="belege-jahr">2024</span></h2>
+                <h2>📋 Belege <span id="belege-jahr-2">2024</span></h2>
                 <div id="belege-liste" class="belege-liste">
                     <!-- Belege werden hier dynamisch eingefügt -->
                 </div>
@@ -138,7 +142,7 @@
         </div>
     </div>
 
-    <!-- Backup Modal -->
+    <!-- Backup Modal - Scrollbar optimiert -->
     <div id="backup-modal" class="modal">
         <div class="modal-content modal-wide">
             <span class="close" id="backup-modal-close">&times;</span>
@@ -196,7 +200,7 @@
             <div class="backup-info-section">
                 <h3>💡 Backup-Tipp</h3>
                 <p>Erstellen Sie regelmäßig ein Backup Ihrer Daten. 
-                   Die JSON-Datei enthält alle Belege und Einstellungen.</p>
+                   Die JSON-Datei enthält alle Belege und Einstellungen und funktioniert mit Hell-/Dunkelmodus.</p>
                 <div class="last-backup" id="last-backup-info"></div>
             </div>
         </div>

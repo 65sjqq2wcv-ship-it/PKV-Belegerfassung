@@ -1,7 +1,7 @@
 {
     "name": "PKV Belege",
     "short_name": "PKV Belege",
-    "description": "Private Krankenversicherung - Belegerfassung und -verwaltung",
+    "description": "Private Krankenversicherung - Belegerfassung und -verwaltung mit Dark Mode Support",
     "start_url": "./",
     "display": "standalone",
     "background_color": "#4A6B7C",
@@ -61,12 +61,6 @@
     "categories": ["finance", "productivity", "medical"],
     "screenshots": [
         {
-            "src": "screenshots/desktop-1.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide"
-        },
-        {
             "src": "screenshots/mobile-1.png",
             "sizes": "390x844",
             "type": "image/png",
@@ -92,7 +86,7 @@
             "url": "./?shortcut=new-receipt",
             "icons": [
                 {
-                    "src": "icons/shortcut-add.png",
+                    "src": "icons/icon-96x96.png",
                     "sizes": "96x96"
                 }
             ]
@@ -104,7 +98,7 @@
             "url": "./?shortcut=overview",
             "icons": [
                 {
-                    "src": "icons/shortcut-overview.png",
+                    "src": "icons/icon-96x96.png",
                     "sizes": "96x96"
                 }
             ]
@@ -116,7 +110,7 @@
             "url": "./?shortcut=backup",
             "icons": [
                 {
-                    "src": "icons/shortcut-backup.png",
+                    "src": "icons/icon-96x96.png",
                     "sizes": "96x96"
                 }
             ]

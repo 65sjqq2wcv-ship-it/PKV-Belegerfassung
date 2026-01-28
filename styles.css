@@ -10,7 +10,24 @@
     --warning-color: #F39C12;
     --danger-color: #E74C3C;
     --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    --header-height: 100px;
+    --header-height: 80px;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-color: #5A7B8C;
+        --secondary-color: #9FBBCC;
+        --accent-color: #3E5A6C;
+        --background-color: #121212;
+        --card-background: #1E1E1E;
+        --text-color: #E0E0E0;
+        --border-color: #333333;
+        --success-color: #4CAF50;
+        --warning-color: #FF9800;
+        --danger-color: #F44336;
+        --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
 }
 
 * {
@@ -19,216 +36,231 @@
     box-sizing: border-box;
 }
 
-/* Safe Area Support für Notch */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.6;
-    padding-top: env(safe-area-inset-top);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-    padding-bottom: env(safe-area-inset-bottom);
-    margin: 0;
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-}
-
-/* iOS Safari Fix */
 html {
     height: -webkit-fill-available;
     scroll-behavior: smooth;
 }
 
+/* iOS Status Bar Farbe - Kritisch für einheitliche Darstellung */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--primary-color); /* Wichtig: Erst Primary Color für Status Bar */
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    padding: 0;
+}
+
 .app {
-    max-width: 800px;
+    background-color: var(--background-color);
     margin: 0 auto;
     min-height: 100vh;
     min-height: -webkit-fill-available;
     display: flex;
     flex-direction: column;
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Fixed Header für App-Feeling - EINFARBIG ohne Verlauf */
+/* Fixed Header - Status Bar Integration */
 header {
     background: var(--primary-color);
     color: white;
     padding: 1rem;
-    padding-top: calc(1rem + env(safe-area-inset-top));
     box-shadow: var(--shadow);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 100;
-    max-width: 800px;
-    margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    /* iOS Status Bar Integration */
+    padding-top: calc(1rem + env(safe-area-inset-top));
 }
 
-/* Header Content */
+/* Status Bar Bereich für iOS */
+@media all and (display-mode: standalone) {
+    /* Zusätzliche Status Bar Unterstützung */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: env(safe-area-inset-top);
+        background: var(--primary-color);
+        z-index: 999;
+    }
+}
+
 .logo {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     flex: 1;
 }
 
 .logo-img {
-    width: 50px;
-    height: 50px;
-    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
 }
 
 .header-content {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.1rem;
 }
 
 .logo h1 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 600;
 }
 
 .version-info {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: rgba(255, 255, 255, 0.8);
     font-weight: 300;
-    letter-spacing: 0.5px;
 }
 
-/* Header Actions */
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
 }
 
 .header-icon-btn {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     cursor: pointer;
     transition: all 0.3s ease;
     -webkit-tap-highlight-color: transparent;
 }
 
-.header-icon-btn:hover,
 .header-icon-btn:active {
     background: rgba(255, 255, 255, 0.2);
     transform: scale(0.95);
 }
 
-/* Main Content mit Padding für Fixed Header */
+/* Main Content */
 main {
-    padding: 1rem;
-    padding-top: calc(var(--header-height) + 1rem);
+    padding: 0.75rem;
+    padding-top: calc(var(--header-height) + 0.75rem);
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
     flex: 1;
 }
 
 section {
     background: var(--card-background);
-    padding: 1.5rem;
-    border-radius: 12px;
+    padding: 1rem;
+    border-radius: 10px;
     box-shadow: var(--shadow);
 }
 
 h2 {
     color: var(--primary-color);
-    margin-bottom: 1rem;
-    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
 }
 
-/* Kompakte Einstellungen */
+/* Kompakte Einstellungen - Label und Input nebeneinander */
 .settings-compact {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
 .setting-row {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
+    gap: 0.75rem;
+    background: var(--background-color);
+    padding: 0.75rem;
+    border-radius: 8px;
 }
 
 .setting-row label {
     font-weight: 500;
     color: var(--primary-color);
-    min-width: 200px;
-    flex-shrink: 0;
-}
-
-.setting-row input {
-    padding: 0.75rem;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
+    font-size: 0.9rem;
     flex: 1;
     min-width: 120px;
 }
 
-.setting-row input:focus {
-    outline: none;
-    border-color: var(--primary-color);
+.setting-row input {
+    padding: 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: var(--card-background);
+    color: var(--text-color);
+    width: 100px;
+    text-align: right;
 }
 
-/* Kompakte Jahr-Auswahl */
+/* Jahr-Auswahl kompakt */
 .year-row {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
+    background: var(--background-color);
+    padding: 0.75rem;
+    border-radius: 8px;
 }
 
 .year-row label {
     font-weight: 500;
     color: var(--primary-color);
-    min-width: 120px;
-    flex-shrink: 0;
+    font-size: 0.9rem;
+    flex: 1;
 }
 
 .year-row select {
-    padding: 0.75rem;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 1rem;
-    background-color: white;
-    flex: 1;
-    max-width: 150px;
+    padding: 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: var(--card-background);
+    color: var(--text-color);
+    width: 80px;
 }
 
-/* Übersicht */
+/* Übersicht - kompakt */
 .overview-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
 }
 
 .overview-card {
     text-align: center;
-    padding: 1.5rem;
+    padding: 1rem;
     background: var(--background-color);
     border-radius: 8px;
-    border: 2px solid var(--border-color);
+    border: 1px solid var(--border-color);
+}
+
+.overview-card:nth-child(3) {
+    grid-column: 1 / -1;
 }
 
 .overview-card h3 {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--text-color);
     margin-bottom: 0.5rem;
     text-transform: uppercase;
@@ -236,13 +268,13 @@ h2 {
 }
 
 .overview-card .amount {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: bold;
     color: var(--primary-color);
 }
 
 .overview-card.lohnt-sich.active {
-    background: linear-gradient(135deg, var(--success-color), #2ECC71);
+    background: var(--success-color);
     color: white;
     border-color: var(--success-color);
 }
@@ -253,52 +285,56 @@ h2 {
 }
 
 .status-text {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    color: var(--text-color);
 }
 
-/* Formular */
+/* Formular - kompakt mit Label nebeneinander wo möglich */
 .beleg-form {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
 .form-group {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--background-color);
+    padding: 0.75rem;
+    border-radius: 8px;
 }
 
 .form-group label {
     font-weight: 500;
     color: var(--primary-color);
+    font-size: 0.9rem;
+    min-width: 90px;
+    flex-shrink: 0;
 }
 
 .form-group input {
-    padding: 0.75rem;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
+    padding: 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: var(--card-background);
+    color: var(--text-color);
+    flex: 1;
 }
 
-.form-group input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-}
-
+/* Button Styles */
 .btn-primary, .btn-secondary, .btn-danger {
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem 1rem;
     border: none;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .btn-primary {
@@ -306,9 +342,9 @@ h2 {
     color: white;
 }
 
-.btn-primary:hover {
+.btn-primary:active {
     background: var(--accent-color);
-    transform: translateY(-2px);
+    transform: scale(0.98);
 }
 
 .btn-secondary {
@@ -316,80 +352,73 @@ h2 {
     color: var(--text-color);
 }
 
-.btn-secondary:hover {
-    background: #D1D8E0;
-}
-
 .btn-danger {
     background: var(--danger-color);
     color: white;
 }
 
-.btn-danger:hover {
-    background: #C0392B;
-}
-
-/* Kompakte Belege Liste */
+/* Sehr kompakte Belege Liste */
 .belege-liste {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem; /* Kompakter Abstand */
+    gap: 0.4rem;
 }
 
 .beleg-item {
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
-    gap: 1rem;
-    padding: 0.75rem; /* Kompakteres Padding */
+    grid-template-columns: 60px 1fr 80px 70px;
+    gap: 0.5rem;
+    padding: 0.6rem;
     background: var(--background-color);
-    border: 1px solid var(--border-color); /* Dünnerer Border */
-    border-radius: 6px; /* Kleinerer Radius */
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
     align-items: center;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
 }
 
-.beleg-item:hover {
-    border-color: var(--secondary-color);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+.beleg-item:active {
+    background: var(--secondary-color);
+    transform: scale(0.99);
 }
 
 .beleg-datum {
-    font-size: 0.85rem; /* Kleinere Schrift */
+    font-size: 0.8rem;
     color: var(--primary-color);
     font-weight: 500;
-    min-width: 75px;
 }
 
 .beleg-beschreibung {
     font-weight: 500;
-    font-size: 0.95rem; /* Etwas kleinere Schrift */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .beleg-betrag {
     font-weight: bold;
     color: var(--primary-color);
     text-align: right;
-    min-width: 70px;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
 }
 
 .beleg-actions {
     display: flex;
-    gap: 0.25rem; /* Kompakterer Abstand */
+    gap: 0.2rem;
 }
 
 .beleg-actions button {
-    padding: 0.4rem; /* Kleinere Buttons */
+    padding: 0.3rem;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.75rem;
-    transition: all 0.3s ease;
-    width: 32px;
-    height: 32px;
+    font-size: 0.7rem;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
 }
 
 .edit-btn {
@@ -397,20 +426,12 @@ h2 {
     color: white;
 }
 
-.edit-btn:hover {
-    background: var(--primary-color);
-}
-
 .delete-btn {
     background: var(--danger-color);
     color: white;
 }
 
-.delete-btn:hover {
-    background: #C0392B;
-}
-
-/* Modal */
+/* Modal - Scrollbar für "Daten verwalten" */
 .modal {
     display: none;
     position: fixed;
@@ -425,51 +446,33 @@ h2 {
 
 .modal-content {
     background-color: var(--card-background);
-    margin: 10% auto;
-    padding: 2rem;
+    margin: 5vh auto;
+    padding: 1.5rem;
     border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
+    width: 95%;
+    max-width: 400px;
     position: relative;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    /* Scrollbar für große Inhalte */
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-wide {
-    max-width: 700px;
+    max-width: 500px;
+    max-height: 85vh; /* Wichtig für Backup Modal */
 }
 
-.close {
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
-    font-size: 2rem;
-    font-weight: bold;
-    cursor: pointer;
-    color: var(--text-color);
-    transition: color 0.3s ease;
-}
-
-.close:hover {
-    color: var(--danger-color);
-}
-
-.modal-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 1.5rem;
-}
-
-/* Backup Modal Styles */
+/* Backup Modal - Scrollbar optimiert */
 .backup-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .backup-section {
-    padding: 1.5rem;
+    padding: 1rem;
     background: var(--background-color);
     border-radius: 8px;
     border: 1px solid var(--border-color);
@@ -477,43 +480,39 @@ h2 {
 
 .backup-section h3 {
     color: var(--primary-color);
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
 }
 
 .backup-btn {
     width: 100%;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    justify-content: center;
-    padding: 1rem;
-    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    font-size: 0.9rem;
 }
 
 .backup-info-text {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--secondary-color);
-    margin: 0;
     text-align: center;
 }
 
+/* Import Controls - kompakt */
 .import-controls {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
 .file-info {
-    padding: 0.75rem;
+    padding: 0.6rem;
     background: var(--card-background);
     border: 2px dashed var(--border-color);
     border-radius: 6px;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--text-color);
-    min-height: 50px;
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -521,130 +520,131 @@ h2 {
 
 .file-info.has-file {
     border-color: var(--success-color);
-    background: #E8F5E8;
+    background: rgba(39, 174, 96, 0.1);
     color: var(--success-color);
     font-weight: 500;
 }
 
 .import-options {
-    padding: 1rem;
+    padding: 0.75rem;
     background: var(--card-background);
     border: 1px solid var(--border-color);
     border-radius: 8px;
 }
 
 .import-options h4 {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     color: var(--primary-color);
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 .radio-option {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 0.4rem;
     border-radius: 4px;
-    transition: background-color 0.3s ease;
+    font-size: 0.8rem;
 }
 
-.radio-option:hover {
+.radio-option:active {
     background: var(--background-color);
-}
-
-.radio-option input[type="radio"] {
-    margin: 0;
-}
-
-.radio-option span {
-    font-size: 0.9rem;
 }
 
 .import-buttons {
     display: flex;
-    gap: 0.75rem;
-    margin-top: 1rem;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
 }
 
 .import-buttons button {
     flex: 1;
+    font-size: 0.8rem;
+    padding: 0.6rem;
 }
 
-.backup-info-section {
-    background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid #90CAF9;
-}
-
-.backup-info-section h3 {
-    color: var(--primary-color);
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
-}
-
-.backup-info-section p {
-    color: var(--text-color);
+/* Update Banner */
+.update-banner {
+    position: fixed;
+    top: calc(var(--header-height) + env(safe-area-inset-top));
+    left: 0;
+    right: 0;
+    background: var(--warning-color);
+    color: white;
+    padding: 0.75rem;
+    text-align: center;
     font-size: 0.9rem;
-    margin-bottom: 0.75rem;
+    z-index: 99;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
 }
 
-.last-backup {
-    font-size: 0.85rem;
-    color: var(--primary-color);
-    font-weight: 500;
+.update-banner.show {
+    transform: translateY(0);
 }
 
-/* Empty State */
+.update-banner button {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+/* Empty State - kompakt */
 .empty-state {
     text-align: center;
-    padding: 2rem 1rem; /* Kompakter */
+    padding: 1.5rem 1rem;
     color: var(--secondary-color);
 }
 
 .empty-state h3 {
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem; /* Etwas kleiner */
+    margin-bottom: 0.4rem;
+    font-size: 1rem;
 }
 
 .empty-state p {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
-/* Success/Error Messages */
+/* Message System */
 .message {
-    padding: 1rem;
+    padding: 0.75rem;
     border-radius: 8px;
-    margin: 1rem 0;
+    margin: 0.75rem 0;
     font-weight: 500;
     text-align: center;
     animation: slideIn 0.3s ease;
+    font-size: 0.9rem;
 }
 
 .message.success {
-    background: #D4EDDA;
-    color: #155724;
-    border: 1px solid #C3E6CB;
+    background: rgba(39, 174, 96, 0.1);
+    color: var(--success-color);
+    border: 1px solid rgba(39, 174, 96, 0.3);
 }
 
 .message.error {
-    background: #F8D7DA;
-    color: #721C24;
-    border: 1px solid #F5C6CB;
+    background: rgba(244, 67, 54, 0.1);
+    color: var(--danger-color);
+    border: 1px solid rgba(244, 67, 54, 0.3);
 }
 
 .message.warning {
-    background: #FFF3CD;
-    color: #856404;
-    border: 1px solid #FFEAA7;
+    background: rgba(255, 152, 0, 0.1);
+    color: var(--warning-color);
+    border: 1px solid rgba(255, 152, 0, 0.3);
 }
 
 @keyframes slideIn {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-10px);
     }
     to {
         opacity: 1;
@@ -652,216 +652,33 @@ h2 {
     }
 }
 
-/* Mobile Anpassungen und Responsive Design */
-@media (max-width: 768px) {
-    :root {
-        --header-height: 90px;
-    }
-    
-    .app {
-        margin: 0;
-    }
-    
-    header {
-        padding: 0.75rem;
-        padding-top: calc(0.75rem + env(safe-area-inset-top));
-    }
-    
-    .header-content {
-        align-items: flex-start;
-    }
-    
-    .version-info {
-        font-size: 0.7rem;
-    }
-    
-    .header-icon-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 1.1rem;
-    }
-    
-    main {
-        padding: 0.75rem;
-        padding-top: calc(var(--header-height) + 0.75rem);
-    }
-    
-    section {
-        padding: 1rem;
-    }
-    
-    /* Kompakte Settings auf Mobile */
-    .setting-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-    
-    .setting-row label {
-        min-width: auto;
-        font-size: 0.9rem;
-    }
-    
-    .setting-row input {
-        width: 100%;
-        min-width: auto;
-    }
-    
-    /* Kompakte Jahr-Auswahl auf Mobile */
-    .year-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-    
-    .year-row label {
-        min-width: auto;
-        font-size: 0.9rem;
-    }
-    
-    .year-row select {
-        width: 100%;
-        max-width: none;
-    }
-    
-    .overview-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .beleg-item {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-        text-align: left;
-    }
-    
-    .beleg-actions {
-        justify-content: center;
-        margin-top: 0.5rem;
-    }
-    
-    .modal-content {
-        margin: 5% auto;
-        padding: 1.5rem;
-        width: 95%;
-    }
-    
-    .modal-wide {
-        width: 95%;
-        max-width: none;
-    }
-    
-    .backup-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .import-buttons {
-        flex-direction: column;
-    }
-    
-    .footer-content {
-        flex-direction: column;
-        gap: 0.5rem;
-        text-align: center;
-    }
-    
-    .footer-version {
-        order: -1;
-    }
-}
-
-/* Spezielle iOS/iPadOS Safari Anpassungen */
+/* iOS optimierungen */
 @supports (-webkit-touch-callout: none) {
     .app {
         min-height: -webkit-fill-available;
     }
-}
-
-/* Landscape Mode auf Smartphones */
-@media screen and (orientation: landscape) and (max-height: 500px) {
-    :root {
-        --header-height: 70px;
-    }
     
-    header {
-        padding: 0.5rem 1rem;
-        padding-top: calc(0.5rem + env(safe-area-inset-top));
-    }
-    
-    .logo h1 {
-        font-size: 1.2rem;
-    }
-    
-    .logo-img {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .header-icon-btn {
-        width: 36px;
-        height: 36px;
-        font-size: 1rem;
-    }
-    
-    section {
-        padding: 1rem;
+    input, select, button {
+        -webkit-appearance: none;
+        border-radius: 6px;
     }
 }
 
-/* PWA Display Mode - Für installierte Apps */
-@media all and (display-mode: standalone) {
-    header {
-        background: var(--primary-color);
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
+/* Dark Mode spezifische Anpassungen */
+@media (prefers-color-scheme: dark) {
+    .file-info.has-file {
+        background: rgba(76, 175, 80, 0.2);
     }
     
-    /* Status Bar Bereich einfärben - iOS */
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: env(safe-area-inset-top);
-        background: var(--primary-color);
-        z-index: 1000;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-}
-
-/* iOS Status Bar Style - Wichtig für korrekte Farbe */
-@media all and (display-mode: standalone) {
-    :root {
-        --ios-status-bar-background: var(--primary-color);
+    .message.success {
+        background: rgba(76, 175, 80, 0.2);
     }
     
-    /* Zusätzlicher Status Bar Support */
-    body {
-        background: var(--primary-color);
-        background: linear-gradient(to bottom, var(--primary-color) env(safe-area-inset-top), var(--background-color) env(safe-area-inset-top));
+    .message.error {
+        background: rgba(244, 67, 54, 0.2);
     }
     
-    .app {
-        background: var(--background-color);
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-    }
-}
-
-/* Zusätzliche Touch-Optimierung für iOS */
-@media (hover: none) and (pointer: coarse) {
-    .header-icon-btn {
-        -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
-        tap-highlight-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    .btn-primary,
-    .btn-secondary,
-    .btn-danger {
-        -webkit-tap-highlight-color: transparent;
-        tap-highlight-color: transparent;
-        min-height: 44px;
+    .message.warning {
+        background: rgba(255, 152, 0, 0.2);
     }
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pkv-belege-v1.4';
+const CACHE_NAME = 'pkv-belege-v1.6';
 const urlsToCache = [
     './',
     './index.html',
@@ -18,6 +18,7 @@ const urlsToCache = [
 
 // Installation
 self.addEventListener('install', event => {
+    console.log('Service Worker installiert - Version 1.5');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
@@ -28,6 +29,8 @@ self.addEventListener('install', event => {
                 console.error('Fehler beim Cachen der Dateien:', error);
             })
     );
+    // Sofortige Aktivierung für Updates
+    self.skipWaiting();
 });
 
 // Fetch Events
@@ -45,8 +48,9 @@ self.addEventListener('fetch', event => {
     );
 });
 
-// Update
+// Update - lösche alte Caches
 self.addEventListener('activate', event => {
+    console.log('Service Worker aktiviert - Version 1.5');
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
@@ -59,39 +63,49 @@ self.addEventListener('activate', event => {
             );
         })
     );
+    // Übernehme sofort die Kontrolle über alle Clients
+    return self.clients.claim();
+});
+
+// Message Handler für Update-Benachrichtigungen
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });
 
 // Background Sync (optional für zukünftige Features)
 self.addEventListener('sync', event => {
     if (event.tag === 'background-sync') {
         event.waitUntil(
-            // Hier könnten Daten synchronisiert werden
             console.log('Background Sync ausgeführt')
         );
     }
 });
 
-// Push Notifications (optional für Erinnerungen)
+// Push Notifications mit Update-Support
 self.addEventListener('push', event => {
     const options = {
-        body: event.data ? event.data.text() : 'Neue Benachrichtigung',
+        body: event.data ? event.data.text() : 'PKV Belege wurde aktualisiert!',
         icon: './icons/icon-192x192.png',
         badge: './icons/icon-96x96.png',
         vibrate: [100, 50, 100],
+        tag: 'pkv-update',
         data: {
             dateOfArrival: Date.now(),
-            primaryKey: 1
+            primaryKey: 1,
+            type: 'update'
         },
         actions: [
             {
                 action: 'explore',
                 title: 'App öffnen',
-                icon: './icons/checkmark.png'
+                icon: './icons/icon-96x96.png'
             },
             {
                 action: 'close',
-                title: 'Schließen',
-                icon: './icons/xmark.png'
+                title: 'Später',
+                icon: './icons/icon-96x96.png'
             }
         ]
     };
@@ -101,7 +115,7 @@ self.addEventListener('push', event => {
     );
 });
 
-// Notification Click
+// Notification Click Handler
 self.addEventListener('notificationclick', event => {
     event.notification.close();
 
@@ -109,5 +123,16 @@ self.addEventListener('notificationclick', event => {
         event.waitUntil(
             clients.openWindow('./')
         );
+    }
+});
+
+// Version Check für Update-Banner
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'GET_VERSION') {
+        event.ports[0].postMessage({
+            type: 'VERSION_INFO',
+            version: '1.5',
+            cacheVersion: CACHE_NAME
+        });
     }
 });

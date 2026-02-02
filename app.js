@@ -1,6 +1,6 @@
 class PKVBelegeApp {
     constructor() {
-        this.currentVersion = '1.5';
+        this.currentVersion = '1.6';
         this.belege = JSON.parse(localStorage.getItem('pkv-belege') || '[]');
         this.einstellungen = JSON.parse(localStorage.getItem('pkv-einstellungen') || '{}');
         this.aktuellesJahr = new Date().getFullYear();
@@ -20,14 +20,27 @@ class PKVBelegeApp {
     }
 
     setupEventListeners() {
-        // Einstellungen
-        document.getElementById('selbstbeteiligung').addEventListener('input', () => this.saveEinstellungen());
-        document.getElementById('beitragsrueckerstattung').addEventListener('input', () => this.saveEinstellungen());
+        // Währungseingabe Setup für Einstellungen
+        this.setupCurrencyInput('selbstbeteiligung');
+        this.setupCurrencyInput('beitragsrueckerstattung');
 
         // Jahr Selection
         document.getElementById('jahresauswahl').addEventListener('change', (e) => {
             this.aktuellesJahr = parseInt(e.target.value);
             this.updateUI();
+        });
+
+        // Event-Delegation für Beleg-Buttons
+        document.getElementById('belege-liste').addEventListener('click', (e) => {
+            const target = e.target;
+            const action = target.getAttribute('data-action');
+            const id = parseInt(target.getAttribute('data-id'));
+
+            if (action === 'edit' && id) {
+                this.editBeleg(id);
+            } else if (action === 'delete' && id) {
+                this.deleteBeleg(id);
+            }
         });
 
         // Beleg Form
@@ -66,16 +79,88 @@ class PKVBelegeApp {
         document.getElementById('beleg-datum').valueAsDate = new Date();
     }
 
+    // Währungsformatierung Methoden
+    setupCurrencyInput(inputId) {
+        const input = document.getElementById(inputId);
+        let isBlurring = false;
+        
+        input.addEventListener('focus', (e) => {
+            // Beim Focus: Nur die Zahl zeigen ohne €
+            const currentValue = e.target.value;
+            if (currentValue.includes('€')) {
+                const numberValue = parseFloat(currentValue.replace(/[€\s.]/g, '').replace(',', '.')) || 0;
+                if (numberValue > 0) {
+                    e.target.value = numberValue.toString().replace('.', ',');
+                } else {
+                    e.target.value = '';
+                }
+            }
+        });
+
+        input.addEventListener('blur', (e) => {
+            if (isBlurring) return;
+            isBlurring = true;
+            
+            const inputValue = e.target.value.trim();
+            let numberValue = 0;
+            
+            if (inputValue && inputValue !== '') {
+                // Einfache Konvertierung: Komma durch Punkt ersetzen
+                const cleanValue = inputValue.replace(',', '.');
+                numberValue = parseFloat(cleanValue) || 0;
+            }
+            
+            // Formatierte Anzeige setzen
+            if (numberValue > 0) {
+                e.target.value = new Intl.NumberFormat('de-DE', {
+                    style: 'currency',
+                    currency: 'EUR'
+                }).format(numberValue);
+            } else {
+                e.target.value = '';
+            }
+            
+            // Direkt speichern
+            this.saveCurrencyValue(inputId, numberValue);
+            
+            setTimeout(() => { isBlurring = false; }, 100);
+        });
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.target.blur();
+            }
+        });
+
+        // Nur Zahlen und Komma erlauben
+        input.addEventListener('input', (e) => {
+            const value = e.target.value;
+            const cleanValue = value.replace(/[^0-9,]/g, '');
+            if (value !== cleanValue) {
+                e.target.value = cleanValue;
+            }
+        });
+    }
+
+    saveCurrencyValue(inputId, value) {
+        if (inputId === 'selbstbeteiligung') {
+            this.einstellungen.selbstbeteiligung = value;
+        } else if (inputId === 'beitragsrueckerstattung') {
+            this.einstellungen.beitragsrueckerstattung = value;
+        }
+        
+        localStorage.setItem('pkv-einstellungen', JSON.stringify(this.einstellungen));
+        this.updateOverview();
+    }
+
     // Update Check System
     async checkForUpdates() {
         const lastVersion = localStorage.getItem('pkv-app-version');
         const lastCheck = localStorage.getItem('pkv-last-update-check');
-        const now = new Date().toISOString().split('T')[0]; // Nur Datum
+        const now = new Date().toISOString().split('T')[0];
 
-        // Prüfe auf neue Version oder einmal täglich
         if (lastVersion !== this.currentVersion || lastCheck !== now) {
             try {
-                // Simuliere Versionsprüfung (könnte später durch echte API ersetzt werden)
                 const isNewVersion = lastVersion && lastVersion !== this.currentVersion;
 
                 if (isNewVersion) {
@@ -91,7 +176,6 @@ class PKVBelegeApp {
     }
 
     showUpdateBanner() {
-        // Erstelle Update Banner
         const banner = document.createElement('div');
         banner.className = 'update-banner';
         banner.innerHTML = `
@@ -102,12 +186,10 @@ class PKVBelegeApp {
 
         document.body.appendChild(banner);
 
-        // Banner nach kurzer Verzögerung anzeigen
         setTimeout(() => {
             banner.classList.add('show');
         }, 1000);
 
-        // Automatisch nach 10 Sekunden ausblenden
         setTimeout(() => {
             this.hideUpdateBanner();
         }, 10000);
@@ -137,8 +219,21 @@ class PKVBelegeApp {
     }
 
     loadEinstellungen() {
-        document.getElementById('selbstbeteiligung').value = this.einstellungen.selbstbeteiligung || '';
-        document.getElementById('beitragsrueckerstattung').value = this.einstellungen.beitragsrueckerstattung || '';
+        const selbstbeteiligung = this.einstellungen.selbstbeteiligung || 0;
+        const beitragsrueckerstattung = this.einstellungen.beitragsrueckerstattung || 0;
+        
+        const selbstInput = document.getElementById('selbstbeteiligung');
+        const beitragsInput = document.getElementById('beitragsrueckerstattung');
+        
+        if (document.activeElement !== selbstInput) {
+            selbstInput.value = selbstbeteiligung > 0 ? 
+                new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(selbstbeteiligung) : '';
+        }
+        
+        if (document.activeElement !== beitragsInput) {
+            beitragsInput.value = beitragsrueckerstattung > 0 ? 
+                new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(beitragsrueckerstattung) : '';
+        }
     }
 
     loadJahresauswahl() {
@@ -158,11 +253,6 @@ class PKVBelegeApp {
     }
 
     saveEinstellungen() {
-        this.einstellungen = {
-            selbstbeteiligung: parseFloat(document.getElementById('selbstbeteiligung').value) || 0,
-            beitragsrueckerstattung: parseFloat(document.getElementById('beitragsrueckerstattung').value) || 0
-        };
-        localStorage.setItem('pkv-einstellungen', JSON.stringify(this.einstellungen));
         this.updateUI();
     }
 
@@ -178,33 +268,34 @@ class PKVBelegeApp {
             return;
         }
 
-        if (this.editingId !== null) {
-            const index = this.belege.findIndex(b => b.id === this.editingId);
+        if (this.editingId) {
+            // Bearbeiten
+            const index = this.belege.findIndex(beleg => beleg.id === this.editingId);
             if (index !== -1) {
                 this.belege[index] = {
-                    ...this.belege[index],
+                    id: this.editingId,
                     datum,
                     beschreibung,
                     betrag
                 };
+                this.showMessage('Beleg erfolgreich aktualisiert!', 'success');
+                this.cancelEdit();
             }
-            this.editingId = null;
-            document.getElementById('beleg-cancel').style.display = 'none';
         } else {
-            const beleg = {
+            // Neu hinzufügen
+            const neuerBeleg = {
                 id: Date.now(),
                 datum,
                 beschreibung,
-                betrag,
-                erfasst: new Date().toISOString()
+                betrag
             };
-            this.belege.push(beleg);
+            this.belege.push(neuerBeleg);
+            this.showMessage('Beleg erfolgreich hinzugefügt!', 'success');
         }
 
         this.saveBelege();
         this.resetForm();
         this.updateUI();
-        this.showMessage('Beleg erfolgreich gespeichert! 💾', 'success');
     }
 
     handleEditSubmit(e) {
@@ -215,38 +306,53 @@ class PKVBelegeApp {
         const beschreibung = document.getElementById('edit-beschreibung').value.trim();
         const betrag = parseFloat(document.getElementById('edit-betrag').value);
 
-        const index = this.belege.findIndex(b => b.id === id);
+        if (!datum || !beschreibung || !betrag) {
+            this.showMessage('Bitte alle Felder ausfüllen.', 'error');
+            return;
+        }
+
+        const index = this.belege.findIndex(beleg => beleg.id === id);
         if (index !== -1) {
-            this.belege[index] = {
-                ...this.belege[index],
-                datum,
-                beschreibung,
-                betrag
-            };
+            this.belege[index] = { id, datum, beschreibung, betrag };
             this.saveBelege();
             this.updateUI();
             this.closeModal();
-            this.showMessage('Beleg aktualisiert! ✅', 'success');
+            this.showMessage('Beleg erfolgreich bearbeitet!', 'success');
         }
     }
 
     editBeleg(id) {
         const beleg = this.belege.find(b => b.id === id);
         if (beleg) {
-            document.getElementById('edit-id').value = id;
-            document.getElementById('edit-datum').value = beleg.datum;
-            document.getElementById('edit-beschreibung').value = beleg.beschreibung;
-            document.getElementById('edit-betrag').value = beleg.betrag;
-            document.getElementById('edit-modal').style.display = 'block';
+            if (window.innerWidth <= 768) {
+                // Mobile: Inline-Bearbeitung
+                this.editingId = id;
+                document.getElementById('beleg-datum').value = beleg.datum;
+                document.getElementById('beleg-beschreibung').value = beleg.beschreibung;
+                document.getElementById('beleg-betrag').value = beleg.betrag;
+                document.getElementById('beleg-cancel').style.display = 'inline-block';
+                
+                // Zum Formular scrollen
+                document.querySelector('.add-receipt-section').scrollIntoView({ 
+                    behavior: 'smooth' 
+                });
+            } else {
+                // Desktop: Modal
+                document.getElementById('edit-id').value = beleg.id;
+                document.getElementById('edit-datum').value = beleg.datum;
+                document.getElementById('edit-beschreibung').value = beleg.beschreibung;
+                document.getElementById('edit-betrag').value = beleg.betrag;
+                document.getElementById('edit-modal').style.display = 'block';
+            }
         }
     }
 
     deleteBeleg(id) {
-        if (confirm('Beleg wirklich löschen?')) {
-            this.belege = this.belege.filter(b => b.id !== id);
+        if (confirm('Sind Sie sicher, dass Sie diesen Beleg löschen möchten?')) {
+            this.belege = this.belege.filter(beleg => beleg.id !== id);
             this.saveBelege();
             this.updateUI();
-            this.showMessage('Beleg gelöscht 🗑️', 'warning');
+            this.showMessage('Beleg erfolgreich gelöscht!', 'success');
         }
     }
 
@@ -276,11 +382,10 @@ class PKVBelegeApp {
         });
     }
 
-    // Korrektur 2: updateUI() Funktion - Beide Jahr-Spans aktualisieren
     updateUI() {
         this.updateOverview();
         this.updateBelegeList();
-        // KORREKTUR: Beide Jahr-Anzeigen aktualisieren
+        this.loadEinstellungen();
         document.getElementById('belege-jahr').textContent = this.aktuellesJahr;
         const belegeJahr2 = document.getElementById('belege-jahr-2');
         if (belegeJahr2) {
@@ -288,14 +393,12 @@ class PKVBelegeApp {
         }
     }
 
-    // Korrektur 1: updateOverview() Funktion - Summe statt Maximum
     updateOverview() {
         const jahresBelege = this.getBelegeForYear(this.aktuellesJahr);
         const gesamtbetrag = jahresBelege.reduce((sum, beleg) => sum + beleg.betrag, 0);
         const selbstbeteiligung = this.einstellungen.selbstbeteiligung || 0;
         const beitragsrueckerstattung = this.einstellungen.beitragsrueckerstattung || 0;
 
-        // KORREKTUR: Summe statt Maximum verwenden
         const mindestbetrag = selbstbeteiligung + beitragsrueckerstattung;
         const nochBisEinreichung = Math.max(0, mindestbetrag - gesamtbetrag);
         const lohntSich = gesamtbetrag >= mindestbetrag && mindestbetrag > 0;
@@ -332,13 +435,13 @@ class PKVBelegeApp {
         jahresBelege.sort((a, b) => new Date(b.datum) - new Date(a.datum));
 
         liste.innerHTML = jahresBelege.map(beleg => `
-            <div class="beleg-item">
+            <div class="beleg-item" data-id="${beleg.id}">
                 <div class="beleg-datum">${this.formatDate(beleg.datum)}</div>
                 <div class="beleg-beschreibung">${beleg.beschreibung}</div>
                 <div class="beleg-betrag">${this.formatCurrency(beleg.betrag)}</div>
                 <div class="beleg-actions">
-                    <button class="edit-btn" onclick="app.editBeleg(${beleg.id})">✏️</button>
-                    <button class="delete-btn" onclick="app.deleteBeleg(${beleg.id})">🗑️</button>
+                    <button class="edit-btn" data-action="edit" data-id="${beleg.id}">✏️</button>
+                    <button class="delete-btn" data-action="delete" data-id="${beleg.id}">🗑️</button>
                 </div>
             </div>
         `).join('');
@@ -484,6 +587,7 @@ class PKVBelegeApp {
         }
 
         this.saveBelege();
+        localStorage.setItem('pkv-einstellungen', JSON.stringify(this.einstellungen));
         this.updateUI();
         this.cancelImport();
 
@@ -497,7 +601,6 @@ class PKVBelegeApp {
         document.getElementById('import-file-info').innerHTML = 'Keine Datei ausgewählt';
         document.getElementById('import-file-info').classList.remove('has-file');
         document.getElementById('import-options').style.display = 'none';
-
         document.querySelector('input[value="replace"]').checked = true;
     }
 
@@ -573,11 +676,8 @@ class PKVBelegeApp {
         if ('serviceWorker' in navigator) {
             try {
                 const registration = await navigator.serviceWorker.register('sw.js');
-                console.log('Service Worker registriert');
 
-                // Prüfe auf Updates
                 registration.addEventListener('updatefound', () => {
-                    console.log('Service Worker Update gefunden');
                     this.showUpdateBanner();
                 });
             } catch (error) {

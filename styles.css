@@ -492,9 +492,20 @@ h2 {
     animation: modalSlideIn 0.3s ease;
 }
 
+/* Backup Modal - Scrollbar Fix */
 .modal-wide {
     max-width: 480px;
-    max-height: 75vh;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Wrapper für scrollbaren Inhalt im Backup Modal */
+.backup-content-wrapper {
+    padding: 1.5rem;
+    overflow-y: auto;
+    max-height: calc(85vh - 100px);
+    flex: 1;
 }
 
 @keyframes modalFadeIn {
@@ -524,6 +535,7 @@ h2 {
     color: var(--text-color);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     position: relative;
+    flex-shrink: 0;
 }
 
 .close {
@@ -943,6 +955,17 @@ h2 {
         max-height: 80vh;
     }
     
+    .modal-wide {
+        margin: 5vh auto;
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .backup-content-wrapper {
+        max-height: calc(90vh - 80px);
+        padding: 1rem;
+    }
+    
     .modal-content h2 {
         padding: 1rem 1.25rem;
         font-size: 1rem;
@@ -983,20 +1006,24 @@ h2 {
 }
 
 /* Scrollbar für Modal Content */
-.modal-content form::-webkit-scrollbar {
+.modal-content form::-webkit-scrollbar,
+.backup-content-wrapper::-webkit-scrollbar {
     width: 4px;
 }
 
-.modal-content form::-webkit-scrollbar-track {
+.modal-content form::-webkit-scrollbar-track,
+.backup-content-wrapper::-webkit-scrollbar-track {
     background: var(--background-color);
     border-radius: 2px;
 }
 
-.modal-content form::-webkit-scrollbar-thumb {
+.modal-content form::-webkit-scrollbar-thumb,
+.backup-content-wrapper::-webkit-scrollbar-thumb {
     background: var(--border-color);
     border-radius: 2px;
 }
 
-.modal-content form::-webkit-scrollbar-thumb:hover {
+.modal-content form::-webkit-scrollbar-thumb:hover,
+.backup-content-wrapper::-webkit-scrollbar-thumb:hover {
     background: var(--text-secondary);
 }

@@ -31,7 +31,7 @@
                 <img src="logo.png" alt="PKV Belege" class="logo-img">
                 <div class="header-content">
                     <h1>PKV Belege</h1>
-                    <div class="version-info">v1.11</div>
+                    <div class="version-info">v1.12</div>
                 </div>
             </div>
             <div class="header-actions">
@@ -147,12 +147,15 @@
     </div>
 
     <!-- Backup Modal - Scrollbar optimiert -->
-    <div id="backup-modal" class="modal">
-        <div class="modal-content modal-wide">
-            <span class="close" id="backup-modal-close">&times;</span>
-            <h2>💾 Daten verwalten</h2>
-            
+<div id="backup-modal" class="modal">
+    <div class="modal-content modal-wide">
+        <span class="close" id="backup-modal-close">&times;</span>
+        <h2>💾 Daten verwalten</h2>
+        
+        <!-- Neuer scrollbarer Wrapper -->
+        <div class="backup-content-wrapper">
             <div class="backup-grid">
+                <!-- Dein existierender Inhalt bleibt gleich -->
                 <!-- Export Section -->
                 <div class="backup-section">
                     <h3>📤 Daten exportieren</h3>
@@ -207,8 +210,9 @@
                    Die JSON-Datei enthält alle Belege und Einstellungen und funktioniert mit Hell-/Dunkelmodus.</p>
                 <div class="last-backup" id="last-backup-info"></div>
             </div>
-        </div>
+        </div> <!-- Ende des scrollbaren Wrappers -->
     </div>
+</div>
 
     <script src="app.js"></script>
 </body>

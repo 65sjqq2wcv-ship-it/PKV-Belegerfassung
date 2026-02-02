@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pkv-belege-v1.11';
+const CACHE_NAME = 'pkv-belege-v1.12';
 const urlsToCache = [
     './',
     './index.html',

@@ -1,6 +1,6 @@
 class PKVBelegeApp {
     constructor() {
-        this.currentVersion = '1.6';
+        this.currentVersion = '1.14';
         this.belege = JSON.parse(localStorage.getItem('pkv-belege') || '[]');
         this.einstellungen = JSON.parse(localStorage.getItem('pkv-einstellungen') || '{}');
         this.aktuellesJahr = new Date().getFullYear();

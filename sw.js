@@ -1,4 +1,10 @@
-const CACHE_NAME = 'pkv-belege-v1.13';
+// Service Worker - PKV Belege App
+// Keine externen Dependencies - alles inline
+
+const APP_VERSION = '1.14'; // ← Nur diese Zeile für Updates ändern
+const CACHE_NAME = `pkv-belege-v${APP_VERSION}`;
+const APP_NAME = 'PKV Belege';
+
 const urlsToCache = [
     './',
     './index.html',
@@ -18,11 +24,11 @@ const urlsToCache = [
 
 // Installation
 self.addEventListener('install', event => {
-    console.log('Service Worker installiert - Version 1.5');
+    console.log(`Service Worker installiert - Version ${APP_VERSION}`);
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('Cache geöffnet');
+                console.log('Cache geöffnet:', CACHE_NAME);
                 return cache.addAll(urlsToCache);
             })
             .catch(error => {
@@ -33,29 +39,15 @@ self.addEventListener('install', event => {
     self.skipWaiting();
 });
 
-// Fetch Events
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                // Cache hit - return response
-                if (response) {
-                    return response;
-                }
-                return fetch(event.request);
-            }
-        )
-    );
-});
-
-// Update - lösche alte Caches
+// Aktivierung - lösche alte Caches
 self.addEventListener('activate', event => {
-    console.log('Service Worker aktiviert - Version 1.5');
+    console.log(`Service Worker aktiviert - Version ${APP_VERSION}`);
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) {
+                    // Lösche nur PKV-Belege Caches, die nicht die aktuelle Version sind
+                    if (cacheName.startsWith('pkv-belege-v') && cacheName !== CACHE_NAME) {
                         console.log('Lösche alten Cache:', cacheName);
                         return caches.delete(cacheName);
                     }
@@ -67,34 +59,167 @@ self.addEventListener('activate', event => {
     return self.clients.claim();
 });
 
-// Message Handler für Update-Benachrichtigungen
-self.addEventListener('message', event => {
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
+// Fetch Events - Intelligente Caching-Strategie
+self.addEventListener('fetch', event => {
+    // Nur GET-Requests cachen
+    if (event.request.method !== 'GET') {
+        return;
+    }
+
+    const url = new URL(event.request.url);
+    const isNavigationRequest = event.request.mode === 'navigate';
+    const isHTMLRequest = event.request.destination === 'document' || 
+                         url.pathname.endsWith('.html') || 
+                         url.pathname === '/' ||
+                         url.pathname.endsWith('/');
+
+    // Für HTML/Navigation: Network First (für schnelle Updates)
+    if (isNavigationRequest || isHTMLRequest) {
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    // Bei erfolgreichem Network-Request, Cache aktualisieren
+                    if (response && response.status === 200) {
+                        const responseClone = response.clone();
+                        caches.open(CACHE_NAME).then(cache => {
+                            cache.put(event.request, responseClone);
+                        });
+                    }
+                    return response;
+                })
+                .catch(() => {
+                    // Bei Netzwerkfehler, Cache verwenden
+                    return caches.match(event.request)
+                        .then(cachedResponse => {
+                            if (cachedResponse) {
+                                return cachedResponse;
+                            }
+                            // Fallback für Navigation-Requests
+                            if (isNavigationRequest) {
+                                return caches.match('./index.html');
+                            }
+                            throw new Error('Keine Cache-Antwort verfügbar');
+                        });
+                })
+        );
+    }
+    // Für Assets (CSS, JS, Bilder): Cache First (Performance)
+    else {
+        event.respondWith(
+            caches.match(event.request)
+                .then(cachedResponse => {
+                    if (cachedResponse) {
+                        return cachedResponse;
+                    }
+                    
+                    // Falls nicht im Cache, vom Netzwerk laden
+                    return fetch(event.request).then(response => {
+                        // Nur erfolgreiche Responses cachen
+                        if (response && response.status === 200) {
+                            const responseClone = response.clone();
+                            caches.open(CACHE_NAME).then(cache => {
+                                cache.put(event.request, responseClone);
+                            });
+                        }
+                        return response;
+                    });
+                })
+        );
     }
 });
 
-// Background Sync (optional für zukünftige Features)
+// Message Handler für Update-Benachrichtigungen und Kommunikation
+self.addEventListener('message', event => {
+    const message = event.data;
+    
+    if (!message) return;
+
+    switch (message.type) {
+        case 'SKIP_WAITING':
+            self.skipWaiting();
+            break;
+            
+        case 'GET_VERSION':
+            if (event.ports && event.ports[0]) {
+                event.ports[0].postMessage({
+                    type: 'VERSION_INFO',
+                    version: APP_VERSION,
+                    cacheVersion: CACHE_NAME,
+                    appName: APP_NAME
+                });
+            }
+            break;
+            
+        case 'CLEAR_CACHE':
+            event.waitUntil(
+                caches.delete(CACHE_NAME).then(() => {
+                    console.log('Cache gelöscht auf Benutzeranfrage');
+                    if (event.ports && event.ports[0]) {
+                        event.ports[0].postMessage({
+                            type: 'CACHE_CLEARED',
+                            success: true
+                        });
+                    }
+                })
+            );
+            break;
+    }
+});
+
+// Background Sync (für zukünftige Features)
 self.addEventListener('sync', event => {
+    console.log('Background Sync Event:', event.tag);
+    
     if (event.tag === 'background-sync') {
         event.waitUntil(
-            console.log('Background Sync ausgeführt')
+            // Hier könnten zukünftig offline-Daten synchronisiert werden
+            Promise.resolve().then(() => {
+                console.log('Background Sync ausgeführt');
+                return self.registration.showNotification(`${APP_NAME} - Sync`, {
+                    body: 'Daten wurden im Hintergrund synchronisiert',
+                    icon: './icons/icon-192x192.png',
+                    badge: './icons/icon-96x96.png',
+                    tag: 'sync-notification'
+                });
+            })
         );
     }
 });
 
 // Push Notifications mit Update-Support
 self.addEventListener('push', event => {
-    const options = {
-        body: event.data ? event.data.text() : 'PKV Belege wurde aktualisiert!',
+    let notificationData = {
+        title: APP_NAME,
+        body: `${APP_NAME} wurde aktualisiert!`,
         icon: './icons/icon-192x192.png',
-        badge: './icons/icon-96x96.png',
+        badge: './icons/icon-96x96.png'
+    };
+
+    // Falls Push-Daten vorhanden sind
+    if (event.data) {
+        try {
+            const pushData = event.data.json();
+            notificationData = {
+                ...notificationData,
+                ...pushData
+            };
+        } catch (e) {
+            // Falls JSON-Parsing fehlschlägt, Text verwenden
+            notificationData.body = event.data.text() || notificationData.body;
+        }
+    }
+
+    const options = {
+        body: notificationData.body,
+        icon: notificationData.icon,
+        badge: notificationData.badge,
         vibrate: [100, 50, 100],
         tag: 'pkv-update',
         data: {
             dateOfArrival: Date.now(),
             primaryKey: 1,
-            type: 'update'
+            type: 'update',
+            url: './'
         },
         actions: [
             {
@@ -111,28 +236,55 @@ self.addEventListener('push', event => {
     };
 
     event.waitUntil(
-        self.registration.showNotification('PKV Belege', options)
+        self.registration.showNotification(notificationData.title, options)
     );
 });
 
 // Notification Click Handler
 self.addEventListener('notificationclick', event => {
+    console.log('Notification Click:', event.action);
     event.notification.close();
 
-    if (event.action === 'explore') {
+    if (event.action === 'explore' || !event.action) {
+        // App öffnen oder in den Vordergrund bringen
         event.waitUntil(
-            clients.openWindow('./')
+            clients.matchAll({
+                type: 'window',
+                includeUncontrolled: true
+            }).then(clientList => {
+                // Prüfen ob App bereits geöffnet ist
+                for (const client of clientList) {
+                    if (client.url.includes(self.location.origin) && 'focus' in client) {
+                        return client.focus();
+                    }
+                }
+                // Falls nicht geöffnet, neue Instanz öffnen
+                if (clients.openWindow) {
+                    return clients.openWindow('./');
+                }
+            })
         );
     }
+    // Bei 'close' Action passiert nichts (Notification wird nur geschlossen)
 });
 
-// Version Check für Update-Banner
-self.addEventListener('message', event => {
-    if (event.data && event.data.type === 'GET_VERSION') {
-        event.ports[0].postMessage({
-            type: 'VERSION_INFO',
-            version: '1.5',
-            cacheVersion: CACHE_NAME
-        });
-    }
+// Notification Close Handler
+self.addEventListener('notificationclose', event => {
+    console.log('Notification geschlossen:', event.notification.tag);
+    // Analytics oder andere Tracking-Ereignisse könnten hier hinzugefügt werden
 });
+
+// Error Handler für unbehandelte Errors
+self.addEventListener('error', event => {
+    console.error('Service Worker Error:', event.error);
+});
+
+// Unhandled Promise Rejections
+self.addEventListener('unhandledrejection', event => {
+    console.error('Service Worker Unhandled Promise Rejection:', event.reason);
+});
+
+// Logging für Debugging
+console.log(`PKV Belege Service Worker geladen - Version ${APP_VERSION}`);
+console.log('Cache Name:', CACHE_NAME);
+console.log('Zu cachende URLs:', urlsToCache.length);

@@ -79,10 +79,10 @@ body {
 
 /* Header - Dashboard-Style */
 header {
-    background: var(--card-background);
+    background: var(--background-color);
     border-bottom: 1px solid var(--border-color);
     padding: 1rem;
-    box-shadow: var(--shadow);
+    /* box-shadow: var(--shadow);*/
     position: fixed;
     top: 0;
     left: 0;

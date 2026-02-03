@@ -1,6 +1,6 @@
 class PKVBelegeApp {
     constructor() {
-        this.currentVersion = '1.15';
+        this.currentVersion = '1.16';
         this.belege = JSON.parse(localStorage.getItem('pkv-belege') || '[]');
         this.einstellungen = JSON.parse(localStorage.getItem('pkv-einstellungen') || '{}');
         this.aktuellesJahr = new Date().getFullYear();
@@ -401,7 +401,7 @@ class PKVBelegeApp {
 
         const mindestbetrag = selbstbeteiligung + beitragsrueckerstattung;
         const nochBisEinreichung = Math.max(0, mindestbetrag - gesamtbetrag);
-        const lohntSich = gesamtbetrag >= mindestbetrag && gesamtbetrag > 0;
+        const lohntSich = gesamtbetrag > mindestbetrag && gesamtbetrag > 0;
 
         document.getElementById('gesamtbetrag').textContent = this.formatCurrency(gesamtbetrag);
         document.getElementById('noch-bis-einreichung').textContent = this.formatCurrency(nochBisEinreichung);
@@ -411,11 +411,11 @@ class PKVBelegeApp {
 
         if (lohntSich) {
             statusCard.classList.add('active');
-            const erstattungsbetrag = gesamtbetrag - mindestbetrag;
+            const erstattungsbetrag = gesamtbetrag - selbstbeteiligung;
             statusText.textContent = `Einreichung lohnt sich! Erstattung: ${this.formatCurrency(erstattungsbetrag)}`;
         } else {
             statusCard.classList.remove('active');
-            statusText.textContent = nochBisEinreichung > 0 ? 'Noch nicht lohnend' : 'Keine Belege vorhanden';
+            statusText.textContent = gesamtbetrag > 0 ? 'Noch nicht lohnend' : 'Keine Belege vorhanden';
         }
     }
 

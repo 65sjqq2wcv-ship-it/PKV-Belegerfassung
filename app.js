@@ -1,6 +1,6 @@
 class PKVBelegeApp {
     constructor() {
-        this.currentVersion = '1.14';
+        this.currentVersion = '1.15';
         this.belege = JSON.parse(localStorage.getItem('pkv-belege') || '[]');
         this.einstellungen = JSON.parse(localStorage.getItem('pkv-einstellungen') || '{}');
         this.aktuellesJahr = new Date().getFullYear();
@@ -83,7 +83,7 @@ class PKVBelegeApp {
     setupCurrencyInput(inputId) {
         const input = document.getElementById(inputId);
         let isBlurring = false;
-        
+
         input.addEventListener('focus', (e) => {
             // Beim Focus: Nur die Zahl zeigen ohne €
             const currentValue = e.target.value;
@@ -100,16 +100,16 @@ class PKVBelegeApp {
         input.addEventListener('blur', (e) => {
             if (isBlurring) return;
             isBlurring = true;
-            
+
             const inputValue = e.target.value.trim();
             let numberValue = 0;
-            
+
             if (inputValue && inputValue !== '') {
                 // Einfache Konvertierung: Komma durch Punkt ersetzen
                 const cleanValue = inputValue.replace(',', '.');
                 numberValue = parseFloat(cleanValue) || 0;
             }
-            
+
             // Formatierte Anzeige setzen
             if (numberValue > 0) {
                 e.target.value = new Intl.NumberFormat('de-DE', {
@@ -119,10 +119,10 @@ class PKVBelegeApp {
             } else {
                 e.target.value = '';
             }
-            
+
             // Direkt speichern
             this.saveCurrencyValue(inputId, numberValue);
-            
+
             setTimeout(() => { isBlurring = false; }, 100);
         });
 
@@ -148,7 +148,7 @@ class PKVBelegeApp {
         } else if (inputId === 'beitragsrueckerstattung') {
             this.einstellungen.beitragsrueckerstattung = value;
         }
-        
+
         localStorage.setItem('pkv-einstellungen', JSON.stringify(this.einstellungen));
         this.updateOverview();
     }
@@ -221,17 +221,17 @@ class PKVBelegeApp {
     loadEinstellungen() {
         const selbstbeteiligung = this.einstellungen.selbstbeteiligung || 0;
         const beitragsrueckerstattung = this.einstellungen.beitragsrueckerstattung || 0;
-        
+
         const selbstInput = document.getElementById('selbstbeteiligung');
         const beitragsInput = document.getElementById('beitragsrueckerstattung');
-        
+
         if (document.activeElement !== selbstInput) {
-            selbstInput.value = selbstbeteiligung > 0 ? 
+            selbstInput.value = selbstbeteiligung > 0 ?
                 new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(selbstbeteiligung) : '';
         }
-        
+
         if (document.activeElement !== beitragsInput) {
-            beitragsInput.value = beitragsrueckerstattung > 0 ? 
+            beitragsInput.value = beitragsrueckerstattung > 0 ?
                 new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(beitragsrueckerstattung) : '';
         }
     }
@@ -331,10 +331,10 @@ class PKVBelegeApp {
                 document.getElementById('beleg-beschreibung').value = beleg.beschreibung;
                 document.getElementById('beleg-betrag').value = beleg.betrag;
                 document.getElementById('beleg-cancel').style.display = 'inline-block';
-                
+
                 // Zum Formular scrollen
-                document.querySelector('.add-receipt-section').scrollIntoView({ 
-                    behavior: 'smooth' 
+                document.querySelector('.add-receipt-section').scrollIntoView({
+                    behavior: 'smooth'
                 });
             } else {
                 // Desktop: Modal
@@ -401,7 +401,7 @@ class PKVBelegeApp {
 
         const mindestbetrag = selbstbeteiligung + beitragsrueckerstattung;
         const nochBisEinreichung = Math.max(0, mindestbetrag - gesamtbetrag);
-        const lohntSich = gesamtbetrag >= mindestbetrag && mindestbetrag > 0;
+        const lohntSich = gesamtbetrag >= mindestbetrag && gesamtbetrag > 0;
 
         document.getElementById('gesamtbetrag').textContent = this.formatCurrency(gesamtbetrag);
         document.getElementById('noch-bis-einreichung').textContent = this.formatCurrency(nochBisEinreichung);
@@ -411,10 +411,11 @@ class PKVBelegeApp {
 
         if (lohntSich) {
             statusCard.classList.add('active');
-            statusText.textContent = 'Einreichung lohnt sich!';
+            const erstattungsbetrag = gesamtbetrag - mindestbetrag;
+            statusText.textContent = `Einreichung lohnt sich! Erstattung: ${this.formatCurrency(erstattungsbetrag)}`;
         } else {
             statusCard.classList.remove('active');
-            statusText.textContent = nochBisEinreichung > 0 ? 'Noch nicht lohnend' : 'Mindestbetrag erreicht';
+            statusText.textContent = nochBisEinreichung > 0 ? 'Noch nicht lohnend' : 'Keine Belege vorhanden';
         }
     }
 

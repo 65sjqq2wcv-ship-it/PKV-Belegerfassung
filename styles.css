@@ -349,7 +349,7 @@ h2 {
 }
 
 .btn-primary {
-  background: var(--primary-color);
+  background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
   color: white;
 }
 
@@ -359,7 +359,7 @@ h2 {
 }
 
 .btn-secondary {
-  background: var(--background-color);
+  background: linear-gradient(135deg, #f5f6f7 0%, #cacece 100%);
   color: var(--text-color);
   border-color: var(--border-color);
 }

@@ -1,7 +1,7 @@
 // Service Worker - PKV Belege App
 // Keine externen Dependencies - alles inline
 
-const APP_VERSION = '1.17'; // ← Nur diese Zeile für Updates ändern
+const APP_VERSION = '1.18'; // ← Nur diese Zeile für Updates ändern
 const CACHE_NAME = `pkv-belege-v${APP_VERSION}`;
 const APP_NAME = 'PKV Belege';
 
